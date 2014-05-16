@@ -1,0 +1,21 @@
+@(message: String)
+
+@main("Welcome to Play Framework") {
+
+    <div class="well">
+        <h1>@message</h1>
+    </div>
+
+    <div ng-controller='AppCtrl'>
+
+        <form ng-submit='sendUrl()'>
+            <input size='60' ng-model='url' />
+            <input type="submit" value="Send" />
+        </form>
+
+        <h3>Parsing tasks:</h3>
+        <div ng-repeat='scrapTask in scrapTasks'></div>
+
+    </div>
+
+}
