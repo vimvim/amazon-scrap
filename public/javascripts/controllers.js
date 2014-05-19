@@ -10,10 +10,7 @@ angular.module('amazonScrap.controllers', []).
 
         $scope.sendUrl = function () {
 
-            ServerChannel.sendRequest({
-                command: 'startTask',
-                url: $scope.url
-            });
+            ServerChannel.startScrapTask($scope.url);
 
             // add the message to our model locally
             $scope.scrapTasks.push({

@@ -10,7 +10,7 @@ import akka.actor.Actor.Receive
 case class CreateSession(userId:String)
 case class SessionClosed(userId:String)
 
-case class SessionCommand(jsValue:JsValue)
+case class SessionCommand(userId:String, jsValue:JsValue)
 case class CommandResponse(jsValue:JsValue)
 
 case class UserSession(userId:String, enumerator:Enumerator[JsValue], channel:Channel[JsValue], handler:ActorRef)
@@ -34,6 +34,8 @@ class TasksManager extends Actor with ActorLogging {
         val session = UserSession(userId, broadcast._1, broadcast._2, self)
 
         sessions += (userId -> session)
+
+        session
       })
 
       sender ! session
@@ -41,7 +43,10 @@ class TasksManager extends Actor with ActorLogging {
     case SessionClosed(userId) =>
       log.debug(s"Session closed for: $userId")
 
-    case SessionCommand(jsValue) =>
-      log.debug(s"Session command received: $jsValue")
+    case SessionCommand(userId, jsValue) =>
+      log.debug(s"Session command: $userId $jsValue")
+
+
+
   }
 }

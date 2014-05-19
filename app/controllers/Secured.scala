@@ -38,10 +38,10 @@ trait Secured {
    * or unauthF() otherwise
    */
 
-  def withAuth(f: => Int => Request[_ >: AnyContent] => Result): EssentialAction = {
+  def withAuth(f: => (String, Request[_ >: AnyContent]) => Result): EssentialAction = {
     Security.Authenticated(userid, unauthF) {
-      username =>
-        Action(request => f(username.toInt)(request))
+      userid =>
+        Action(request => f(userid,request))
     }
   }
 

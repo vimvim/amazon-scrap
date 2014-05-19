@@ -26,7 +26,16 @@ object Application extends Controller with Secured {
   var sessionManager:ActorRef = Akka.system.actorOf(Props[TasksManager])
 
   def index = withAuth {
-    implicit request => userId =>
+    (userId, request) =>
+
+      /*
+      val sessionFuture = (sessionManager ? CreateSession(userId)).asInstanceOf[Future[UserSession]]
+      sessionFuture map {
+        userSession =>
+          println(s"Session: $userSession")
+      }
+      */
+
       Ok(views.html.index("Hello Play Framework"))
   }
 
@@ -35,10 +44,24 @@ object Application extends Controller with Secured {
     val sessionFuture = (sessionManager ? CreateSession(userid)).asInstanceOf[Future[UserSession]]
     sessionFuture map {
       userSession =>
-        createCommChannels(userSession)
+        (
+          Iteratee.foreach[JsValue](
+            jsValue=>
+              (userSession.handler ? SessionCommand(jsValue)) onSuccess {
+
+                case CommandResponse(respJsValue) =>
+                  userSession.channel.push(respJsValue)
+
+                case _ => println("Unexpected response")
+              }
+          ) map {
+            _ => sessionManager ! SessionClosed(userSession.userId)
+          },
+          userSession.enumerator
+        )
     }
   }
-
+  /*
   private def createCommChannels(userSession:UserSession):(Iteratee[JsValue, Unit], Enumerator[JsValue]) = {
 
     val commandHandler = userCommandHandler(userSession) _
@@ -59,4 +82,5 @@ object Application extends Controller with Secured {
       case _ => println("Unexpected response")
     }
   }
+  */
 }

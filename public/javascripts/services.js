@@ -39,14 +39,29 @@ angular.module('amazonScrap.services', []).
         }
 
         function listener(data) {
+
             var messageObj = data;
+
             console.log("Received data from websocket: ", messageObj);
-            // If an object exists with callback_id in our callbacks object, resolve it
-            if (callbacks.hasOwnProperty(messageObj.callback_id)) {
-                console.log(callbacks[messageObj.callback_id]);
-                $rootScope.$apply(callbacks[messageObj.callback_id].cb.resolve(messageObj.data));
-                delete callbacks[messageObj.callbackID];
+
+            if (!_.isUndefined(messageObj.callback_id)) {
+                // This is callback for async command
+
+                // If an object exists with callback_id in our callbacks object, resolve it
+                if (callbacks.hasOwnProperty(messageObj.callback_id)) {
+                    console.log(callbacks[messageObj.callback_id]);
+                    $rootScope.$apply(callbacks[messageObj.callback_id].cb.resolve(messageObj.data));
+                    delete callbacks[messageObj.callbackID];
+                }
+
+            } else if (!_.isUndefined(messageObj.channel)) {
+                // This is message for info channel
+
+
             }
+
+
+
         }
 
         // This creates a new callback ID for a request
@@ -58,14 +73,19 @@ angular.module('amazonScrap.services', []).
             return currentCallbackId;
         }
 
-        // Define a "getter" for getting customer data
-        Service.getCustomers = function () {
+        Service.startScrapTask = function(url) {
             var request = {
-                type: "get_customers"
+                command: "start_scrap_task",
+                url: url
             };
             // Storing in a variable for clarity on what sendRequest returns
             var promise = sendRequest(request);
             return promise;
+        };
+
+        Service.subscribe = function(channelName) {
+
+
         };
 
         return Service;
