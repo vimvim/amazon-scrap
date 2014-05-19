@@ -26,15 +26,20 @@ angular.module('amazonScrap.services', []).
         };
 
         function sendRequest(request) {
+
             var defer = $q.defer();
+
             var callbackId = getCallbackId();
             callbacks[callbackId] = {
                 time: new Date(),
                 cb: defer
             };
-            request.callback_id = callbackId;
+
+            request.id = callbackId;
+
             console.log('Sending request', request);
             ws.send(JSON.stringify(request));
+
             return defer.promise;
         }
 
@@ -44,24 +49,29 @@ angular.module('amazonScrap.services', []).
 
             console.log("Received data from websocket: ", messageObj);
 
-            if (!_.isUndefined(messageObj.callback_id)) {
+            if (!_.isUndefined(messageObj.id)) {
                 // This is callback for async command
 
                 // If an object exists with callback_id in our callbacks object, resolve it
-                if (callbacks.hasOwnProperty(messageObj.callback_id)) {
-                    console.log(callbacks[messageObj.callback_id]);
-                    $rootScope.$apply(callbacks[messageObj.callback_id].cb.resolve(messageObj.data));
-                    delete callbacks[messageObj.callbackID];
+                if (callbacks.hasOwnProperty(messageObj.id)) {
+
+                    console.log(callbacks[messageObj.id]);
+
+                    $rootScope.$apply(callbacks[messageObj.id].cb.resolve(messageObj.response));
+                    delete callbacks[messageObj.id];
                 }
 
             } else if (!_.isUndefined(messageObj.channel)) {
                 // This is message for info channel
 
+                console.log("Channel msg: "+messageObj.channel, messageObj);
 
+                var channel = "channel_"+messageObj.channel;
+
+                $rootScope.$apply(function () {
+                    $rootScope.$broadcast(channel, messageObj);
+                });
             }
-
-
-
         }
 
         // This creates a new callback ID for a request
@@ -76,16 +86,13 @@ angular.module('amazonScrap.services', []).
         Service.startScrapTask = function(url) {
             var request = {
                 command: "start_scrap_task",
-                url: url
+                data: {
+                    url: url
+                }
             };
             // Storing in a variable for clarity on what sendRequest returns
             var promise = sendRequest(request);
             return promise;
-        };
-
-        Service.subscribe = function(channelName) {
-
-
         };
 
         return Service;

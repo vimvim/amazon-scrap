@@ -4,22 +4,37 @@
 
 angular.module('amazonScrap.controllers', []).
     controller('AppCtrl', ['ServerChannel', '$scope', function(ServerChannel, $scope){
-        // $scope.customers = ServerChannel.getCustomers();
 
-        $scope.scrapTasks = []
+        $scope.scrapTasks = [];
 
         $scope.sendUrl = function () {
 
-            ServerChannel.startScrapTask($scope.url);
-
-            // add the message to our model locally
-            $scope.scrapTasks.push({
-                url: $scope.url
-            });
-
-            // Clear url input
+            var url = $scope.url;
             $scope.url = '';
+
+            var promise = ServerChannel.startScrapTask(url);
+            promise.then(function(response) {
+
+                var taskId = response.task_id;
+
+                $scope.scrapTasks.push({
+                    id: taskId,
+                    url: url
+                });
+            });
         };
+    }]).
+    controller('TaskCtrl', ['ServerChannel', '$scope', '$rootScope', function(ServerChannel, $scope, $rootScope){
 
+        var scrapTask = $scope.scrapTask;
+        var taskChannel = "channel_task_"+scrapTask.id;
+
+        var listener = $rootScope.$on(taskChannel, function (e, msg) {
+            console.log("New Message: " + msg);
+
+            if (msg.name=="task_status") {
+                scrapTask.status = msg.data.status;
+                scrapTask.msg = msg.data.msg;
+            }
+        });
     }]);
-

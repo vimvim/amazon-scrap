@@ -14,7 +14,11 @@
         </form>
 
         <h3>Parsing tasks:</h3>
-        <div ng-repeat='scrapTask in scrapTasks'></div>
+        <div ng-repeat='scrapTask in scrapTasks' ng-controller='TaskCtrl'>
+            Task id: {{ scrapTask.id }}
+            Url: {{ scrapTask.url }}
+            Status: {{ scrapTask.status }}
+        </div>
 
     </div>
 

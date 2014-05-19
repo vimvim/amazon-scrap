@@ -47,7 +47,7 @@ object Application extends Controller with Secured {
         (
           Iteratee.foreach[JsValue](
             jsValue=>
-              (userSession.handler ? SessionCommand(jsValue)) onSuccess {
+              (userSession.handler ? SessionCommand(userid, jsValue)) onSuccess {
 
                 case CommandResponse(respJsValue) =>
                   userSession.channel.push(respJsValue)
