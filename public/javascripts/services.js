@@ -2,7 +2,7 @@
  * Created by vim on 5/15/14.
  */
 
-angular.module('amazonScrap.services').
+angular.module('amazonScrap.services', []).
     factory('ServerChannel', ['$q', '$rootScope', function ($q, $rootScope) {
 
         // We return this object to anything injecting our service
@@ -15,7 +15,7 @@ angular.module('amazonScrap.services').
         var currentCallbackId = 0;
 
         // Create our websocket object with the address to the websocket
-        var ws = new WebSocket("ws://localhost:9000/ws/");
+        var ws = new WebSocket("ws://127.0.0.1:9000/ws/");
 
         ws.onopen = function () {
             console.log("Socket has been opened!");

@@ -7,7 +7,7 @@
 // Declare app level module which depends on filters, and services
 
 angular.module('amazonScrap', [
-    'ngRoute',
+    // 'ngRoute',
 
     'amazonScrap.controllers',
     'amazonScrap.filters',

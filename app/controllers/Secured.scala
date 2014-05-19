@@ -18,7 +18,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 
 trait Secured {
 
-  def username(request: RequestHeader) = {
+  def userid(request: RequestHeader) = {
     //verify or create session, this should be a real login
     request.session.get(Security.username)
   }
@@ -37,12 +37,14 @@ trait Secured {
    * try to retieve the username, call f() if it is present,
    * or unauthF() otherwise
    */
+
   def withAuth(f: => Int => Request[_ >: AnyContent] => Result): EssentialAction = {
-    Security.Authenticated(username, unauthF) {
+    Security.Authenticated(userid, unauthF) {
       username =>
         Action(request => f(username.toInt)(request))
     }
   }
+
 
   /**
    * This function provide a basic authentication for
@@ -51,7 +53,7 @@ trait Secured {
    * or create an error Future[(Iteratee[JsValue, Unit], Enumerator[JsValue])])
    * if username is none
    */
-  def withAuthWS(f: => Int => Future[(Iteratee[JsValue, Unit], Enumerator[JsValue])]): WebSocket[JsValue] = {
+  def withAuthWS(f: => String => Future[(Iteratee[JsValue, Unit], Enumerator[JsValue])]): WebSocket[JsValue, JsValue] = {
 
     def errorFuture = {
       // Just consume and ignore the input
@@ -67,9 +69,9 @@ trait Secured {
 
     WebSocket.async[JsValue] {
       request =>
-        user(request) match {
+        userid(request) match {
           case None => errorFuture
-          case Some(user) => f(user)
+          case Some(userId) => f(userId)
         }
     }
   }

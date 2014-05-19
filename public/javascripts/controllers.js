@@ -2,8 +2,8 @@
  * Created by vim on 5/15/14.
  */
 
-angular.module('amazonScrap.controllers').
-    controller('AppCtrl', ['ServerChannel', function(ServerChannel){
+angular.module('amazonScrap.controllers', []).
+    controller('AppCtrl', ['ServerChannel', '$scope', function(ServerChannel, $scope){
         // $scope.customers = ServerChannel.getCustomers();
 
         $scope.scrapTasks = []
