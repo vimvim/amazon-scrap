@@ -36,7 +36,7 @@ object Application extends Controller with Secured {
       }
       */
 
-      Ok(views.html.index("Hello Play Framework"))
+      Ok(views.html.index("Amazon ScrapDemo"))
   }
 
   def ws = withAuthWS { userid =>

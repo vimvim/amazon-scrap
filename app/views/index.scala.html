@@ -1,6 +1,6 @@
 @(message: String)
 
-@main("Welcome to Play Framework") {
+@main("Amazon Scrap Demo") {
 
     <div class="well">
         <h1>@message</h1>
@@ -8,18 +8,32 @@
 
     <div ng-controller='AppCtrl'>
 
-        <form ng-submit='sendUrl()'>
-            <input size='60' ng-model='url' />
+        <form ng-submit='sendQuery()'>
+            Query: <input size='60' ng-model='query' value="Sony" />
             <input type="submit" value="Send" />
         </form>
 
-        <h3>Parsing tasks:</h3>
-        <div ng-repeat='scrapTask in scrapTasks' ng-controller='TaskCtrl'>
-            Task id: {{ scrapTask.id }}
-            Url: {{ scrapTask.url }}
-            Status: {{ scrapTask.status }}
+        <h3>Scrapping tasks:</h3>
+        <div class="task" ng-repeat='scrapTask in scrapTasks' ng-controller='TaskCtrl'>
+            <div>
+                <b>Id:</b><span>{{ scrapTask.id }}</span>
+            </div>
+            <div>
+                <b>Url:</b><span>{{ scrapTask.url }}</span>
+            </div>
+            <div>
+                <b>Name:</b><span>{{ scrapTask.name }}</span>
+            </div>
+            <div ng-show="scrapTask.price">
+                <b>Price:</b><span>{{ scrapTask.price }}</span>
+            </div>
+            <div ng-show="scrapTask.availability">
+                <b>Availability:</b><span>{{ scrapTask.availability }}</span>
+            </div>
+            <div>
+                <b>Status:</b><span>{{ scrapTask.status }}</span>
+            </div>
         </div>
-
     </div>
 
 }

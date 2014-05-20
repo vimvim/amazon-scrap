@@ -12,16 +12,16 @@ case class ProductLinkParsed(taskId:Int, url:String, name:String)
 /**
  * Created by vim on 5/16/14.
  */
-class AmazonScrapTask(taskId:Int, url:String) extends Actor with ActorLogging {
+class AmazonScrapTask(taskId:Int, query:String) extends Actor with ActorLogging {
 
   override def receive: Receive = {
 
     case StartScrap() =>
-      log.debug(s"Start scrapping: $url")
+      log.debug(s"Start scrapping: $query")
 
       this.context.parent ! ScrapTaskStatus(taskId, "started", "Started")
 
-      val doc = Jsoup.connect("http://www.amazon.com/s/field-keywords=sony").get()
+      val doc = Jsoup.connect(s"http://www.amazon.com/s/field-keywords=$query").get()
       val products = doc.select("#atfResults > div")
 
       val productsItr = products.iterator()
@@ -35,5 +35,7 @@ class AmazonScrapTask(taskId:Int, url:String) extends Actor with ActorLogging {
 
         this.context.parent ! ProductLinkParsed(taskId, url, name)
       }
+
+      this.context.parent ! ScrapTaskStatus(taskId, "completed", "Completed")
   }
 }

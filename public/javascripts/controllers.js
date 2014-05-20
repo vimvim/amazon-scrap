@@ -3,23 +3,43 @@
  */
 
 angular.module('amazonScrap.controllers', []).
-    controller('AppCtrl', ['ServerChannel', '$scope', function(ServerChannel, $scope){
+    controller('AppCtrl', ['ServerChannel', '$scope', '$rootScope', function(ServerChannel, $scope, $rootScope){
 
+        $scope.query = "Sony";
         $scope.scrapTasks = [];
 
-        $scope.sendUrl = function () {
+        var listener = $rootScope.$on("channel_control", function (e, msg) {
 
-            var url = $scope.url;
-            $scope.url = '';
+            console.log("New Message: " + msg);
 
-            var promise = ServerChannel.startScrapTask(url);
+            if (msg.name=="task_created") {
+
+                var taskId = msg.data.task_id;
+                var taskUrl = msg.data.task_url;
+                var taskName = msg.data.task_name;
+
+                $scope.scrapTasks.push({
+                    id: taskId,
+                    url: taskUrl,
+                    name: taskName
+                });
+            }
+        });
+
+        $scope.sendQuery = function () {
+
+            var query = $scope.query;
+            $scope.query = '';
+
+            var promise = ServerChannel.startScrapTask(query);
             promise.then(function(response) {
 
                 var taskId = response.task_id;
 
                 $scope.scrapTasks.push({
                     id: taskId,
-                    url: url
+                    url: query,
+                    name: "Search for: "+query
                 });
             });
         };
@@ -36,5 +56,11 @@ angular.module('amazonScrap.controllers', []).
                 scrapTask.status = msg.data.status;
                 scrapTask.msg = msg.data.msg;
             }
+
+            if (msg.name=="product_data") {
+                scrapTask.price = msg.data.price;
+                scrapTask.availability = msg.data.availability;
+            }
         });
+
     }]);
