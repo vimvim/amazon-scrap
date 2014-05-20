@@ -83,6 +83,16 @@ class TasksManager extends Actor with ActorLogging {
           )
         ))
       })
+
+    case ProductLinkParsed(actorTaskId, productUrl, productName) =>
+
+      taskId = taskId+1
+
+      val taskActor = context.actorOf(Props(classOf[AmazonScrapTask2], taskId, productUrl), name = s"task2_$taskId")
+      tasks += (taskId -> taskActor)
+
+      taskActor ! StartScrap()
+
   }
 
   private def onStartScrapCmd(jsValue:JsValue):JsValue = {
