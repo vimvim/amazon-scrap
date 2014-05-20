@@ -15,7 +15,8 @@ angular.module('amazonScrap.services', []).
         var currentCallbackId = 0;
 
         // Create our websocket object with the address to the websocket
-        var ws = new WebSocket("ws://127.0.0.1:9000/ws/");
+        var wsUri = "ws://"+document.location.host+"/ws/";
+        var ws = new WebSocket(wsUri);
 
         ws.onopen = function () {
             console.log("Socket has been opened!");
